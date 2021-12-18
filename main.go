@@ -34,8 +34,7 @@ func computeLayer(boards [][45]bool, main chan<- [][45]bool) {
 	jobs := make(chan [45]bool)
 	results := make(chan [][45]bool, len(boards))
 
-	for i := 0; i < 3; i++ {
-		fmt.Println("worker", i)
+	for i := 0; i < 500; i++ {
 		go worker(jobs, results)
 	}
 
