@@ -7,16 +7,19 @@ import (
 	"main/starting-board"
 	"main/unique"
 	"os"
+	"time"
 )
 
 func main() {
 	data := [][][45]bool{}
 	main := make(chan [][45]bool, 44)
+	now := time.Now()
 
 	go computeLayer([][45]bool{starting.Board}, main)
 
 	for cur := range main {
-		fmt.Println(len(data)+1, "layers computed items:", len(cur))
+		fmt.Println(len(data)+1, "layers computed items:", len(cur), "time", time.Since(now))
+		now = time.Now()
 		data = append(data, cur)
 	}
 	close(main)
@@ -28,10 +31,13 @@ func main() {
 
 func computeLayer(boards [][45]bool, main chan<- [][45]bool) {
 	layer := [][45]bool{}
-	jobs := make(chan [45]bool, len(boards))
+	jobs := make(chan [45]bool)
 	results := make(chan [][45]bool, len(boards))
 
-	go worker(jobs, results)
+	for i := 0; i < 3; i++ {
+		fmt.Println("worker", i)
+		go worker(jobs, results)
+	}
 
 	for _, board := range boards {
 		jobs <- board
